@@ -14,7 +14,7 @@ namespace Project_FinchControl
     // Application Type: Console
     // Author: Vanderploeg, Casey
     // Dated Created: 6/10/2020
-    // Last Modified: 6/10/2020
+    // Last Modified: 6/11/2020
     //
     // **************************************************
 
@@ -885,72 +885,6 @@ namespace Project_FinchControl
             DisplayMenuPrompt("Light Alarm");
         }
 
-        static void LightAlarmDisplayElapsedTime(int elapsedTime)
-        {
-            Console.SetCursorPosition(20, 20);
-            Console.WriteLine($"Elapsed Time:              ");
-            Console.WriteLine($"Elapsed Time: {elapsedTime}");
-        }
-
-        static bool LightAlarmMonitorLightSensors(Finch finchRobot, string sensorsToMonitor, string rangeType, int minMaxThresholdValue, int timeToMonitor)
-        {
-            bool thresholdExceeded = false;
-            int elapsedTime = 0;
-            int currentLightSensorValue = 0;
-            string sensorsToMonitor = "";
-
-            while (!thresholdExceeded && elapsedTime < timeToMonitor)
-            {
-                currentLightSensorValue = LightAlarmCurrentSensorValue(finchRobot, sensorsToMonitor);
-
-                switch (rangeType)
-                {
-                    case "minimum":
-                        if (currentLightSensorValue < minMaxThresholdValue)
-                        {
-                            thresholdExceeded = true;
-                        }
-                        break;
-
-                    case "maximum":
-                        if (currentLightSensorValue > minMaxThresholdValue)
-                        {
-                            thresholdExceeded = true;
-                        }
-                        break;
-                }
-
-                finchRobot.wait(1000);
-                elapsedTime++;
-                LightAlarmDisplayElapsedTime(elapsedTime);
-            }
-
-            return thresholdExceeded;
-
-        }
-
-        static int LightAlarmCurrentSensorValue(Finch finchRobot, string sensorsToMonitor)
-        {
-            int currentLightSensorValue = 0;
-
-            switch (sensorsToMonitor)
-            {
-                case "left":
-                    currentLightSensorValue = finchRobot.getLeftLightSensor();
-                    break;
-
-                case "right":
-                    currentLightSensorValue = finchRobot.getRightLightSensor();
-                    break;
-
-                case "both":
-                    currentLightSensorValue = (finchRobot.getLeftLightSensor() + finchRobot.getRightLightSensor()) / 2;
-                    currentLightSensorValue = (int)(finchRobot.getLightSensors().Average());
-                    break;
-            }
-            return currentLightSensorValue;
-        }
-
         static int LightAlarmDisplaySetMinimumMaximumThresholdValue(string rangeType, Finch finchRobot)
         {
             int minMaxThresholdValue;
@@ -1041,8 +975,8 @@ namespace Project_FinchControl
 
                 DisplayScreenHeader("Range Type");
 
-                Console.Write("Range Type: [minimum, maximum]");
-                userResponse = Console.ReadLine().ToLower();
+                Console.Write("Range Type: [Minimum, Maximum]");
+                userResponse = Console.ReadLine();
 
                 if (userResponse == "Minimum")
                 {
