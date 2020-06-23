@@ -33,7 +33,7 @@ namespace Project_FinchControl
     // Application Type: Console
     // Author: Vanderploeg, Casey
     // Dated Created: 6/10/2020
-    // Last Modified: 6/14/2020
+    // Last Modified: 6/22/2020
     //
     // **************************************************
 
@@ -45,11 +45,165 @@ namespace Project_FinchControl
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            DisplayLoginRegister();
+
+            //
+            // Call the application menu
+            //
+
             SetTheme();
 
             DisplayWelcomeScreen();
             DisplayMenuScreen();
             DisplayClosingScreen();
+        }
+        /// <summary>
+        /// *****************************
+        /// *   Login/Register Screen   *
+        /// *****************************
+        /// </summary>
+        static void DisplayLoginRegister()
+        {
+            DisplayScreenHeader("Login and/or Register Menu");
+            Console.WriteLine();
+            Console.WriteLine("Have you registered with the program previously? ( yes | no )");
+            if (Console.ReadLine().ToLower() == "yes")
+            {
+                DisplayLogin();
+            }
+            else
+            {
+                DisplayRegisterUser();
+                DisplayLogin();
+            }
+        }
+        static void DisplayLogin()
+        {
+            string userName;
+            string password;
+            bool validLogin;
+
+            do
+            {
+                DisplayScreenHeader("Login");
+
+                Console.WriteLine();
+                Console.Write("\tEnter your user-name:");
+                userName = Console.ReadLine();
+                Console.WriteLine("\tEnter your password: ");
+                password = Console.ReadLine();
+
+                validLogin = IsValidLoginInfo(userName, password);
+
+                Console.WriteLine();
+                if (validLogin)
+                {
+                    Console.WriteLine("\tYou are now logged in.");
+                }
+                else
+                {
+                    Console.WriteLine("\tIt appears either the user-name or password is incorrect.");
+                    Console.WriteLine("\tPlease try again.");
+                }
+
+                DisplayContinuePrompt();
+            } while (!validLogin); 
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="userName"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        static bool IsValidLoginInfo(string userName, string password)
+        {
+            List<(string userName, string password)> registerUserLoginInfo = new List<(string userName, string password)>();
+
+            bool validUser = false;
+
+            registerUserLoginInfo = ReadLoginInfoData();
+
+            //
+            // loop through the list of registered users login tuples and check each one against the login info
+            //
+            
+            foreach((string userName, string password) userLoginInfo in registerUserLoginInfo)
+            {
+                if ((userLoginInfo.userName == userName) && (userLoginInfo.password == password))
+                {
+                    validUser = true;
+                    break;
+                }
+            }
+            return validUser;
+        }
+
+        static void DisplayRegisterUser()
+        {
+            string userName;
+            string password;
+
+            DisplayScreenHeader("Register Screen");
+
+            Console.WriteLine();
+            Console.Write("Please enter a new user-name for your program credentials: ");
+            userName = Console.ReadLine();
+            Console.Write("Please enter a new password for your program credentials: ");
+            password = Console.ReadLine();
+            Console.WriteLine();
+            WriteLoginInfoData(userName, password);
+
+            Console.WriteLine("User-name and password credentials will now be saved to the program");
+            Console.WriteLine();
+            Console.WriteLine($"\tGiven Username: {userName}");
+            Console.WriteLine();
+            Console.WriteLine($"\tGiven Password: {password}");
+
+            DisplayContinuePrompt();
+        }
+
+        static void WriteLoginInfoData(string userName, string password)
+        {
+            string dataPath = @"Data/Logins.txt";
+            string loginInfoText;
+
+            loginInfoText = userName + "," + password;
+
+            File.WriteAllText(dataPath, loginInfoText);
+        }
+
+        static List<(string userName, string password)> ReadLoginInfoData()
+        {
+            string dataPath = @"Data/Logins.txt";
+
+            string[] loginInfoArray;
+            (string userName, string password) loginInfoTuple;
+
+            List<(string userName, string password)> registeredUserLoginInfo = new List<(string userName, string password)>();
+
+            loginInfoArray = File.ReadAllLines(dataPath);
+
+            //
+            // loop through the array
+            // split the user-name and password into a tuple
+            // add the tuple to the list
+            //
+            foreach (string loginInfoText in loginInfoArray)
+            {
+                //
+                // use the split method to separate the user-name and password into an array
+                //
+                loginInfoArray = loginInfoText.Split(',');
+
+                loginInfoTuple.userName = loginInfoArray[0];
+                loginInfoTuple.password = loginInfoArray[1];
+
+                registeredUserLoginInfo.Add(loginInfoTuple);
+
+            }
+
+
+            return registeredUserLoginInfo;
         }
 
         /// <summary>
@@ -61,7 +215,7 @@ namespace Project_FinchControl
             Console.BackgroundColor = ConsoleColor.White;
         }
 
-        /// <summary>
+ /// <summary>
         /// *****************************************************************
         /// *                     Main Menu                                 *
         /// *****************************************************************
@@ -1079,7 +1233,7 @@ namespace Project_FinchControl
         /// *****************************
         /// *   User Programming Menu   *
         /// *****************************
-        
+
         static void UserProgrammingDisplayMenuScreen (Finch finchRobot)
         {
             string menuChoice;
